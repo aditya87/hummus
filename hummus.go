@@ -63,10 +63,9 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 				var childValues []interface{}
 				childTag := fmt.Sprintf("gabs:%q", at.childPath)
 				childFields = append(childFields, reflect.StructField{
-					Name:   t.Field(i).Name,
-					Type:   t.Field(i).Type,
-					Tag:    reflect.StructTag(childTag),
-					Offset: 0,
+					Name: t.Field(i).Name,
+					Type: t.Field(i).Type,
+					Tag:  reflect.StructTag(childTag),
 				})
 
 				childValues = append(childValues, v.Field(i).Interface())
@@ -84,10 +83,9 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 						}
 						nextChildTag := fmt.Sprintf("gabs:%q", atn.childPath)
 						childFields = append(childFields, reflect.StructField{
-							Name:   t.Field(j).Name,
-							Type:   t.Field(j).Type,
-							Tag:    reflect.StructTag(nextChildTag),
-							Offset: 0,
+							Name: t.Field(j).Name,
+							Type: t.Field(j).Type,
+							Tag:  reflect.StructTag(nextChildTag),
 						})
 						childValues = append(childValues, v.Field(j).Interface())
 						j++
