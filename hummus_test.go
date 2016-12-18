@@ -120,5 +120,35 @@ var _ = Describe("Hummus", func() {
 				}
 			}`))
 		})
+
+		It("deals with objects inside arrays", func() {
+			input := struct {
+				Brand0Name string `gabs:"brands[0].name"`
+				Brand0Addr string `gabs:"brands[0].address"`
+				Brand1Name string `gabs:"brands[1].name"`
+				Brand1Addr string `gabs:"brands[1].address"`
+			}{
+				Brand0Name: "sabra",
+				Brand0Addr: "1234 Fake St",
+				Brand1Name: "cedars",
+				Brand1Addr: "567 Other St",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`{
+				"brands": [
+					{
+						"name": "sabra",
+						"address": "1234 Fake St"
+					},
+					{
+						"name": "cedars",
+						"address": "567 Other St"
+					}
+				]
+			}`))
+
+		})
 	})
 })
