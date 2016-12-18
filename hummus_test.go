@@ -28,8 +28,22 @@ var _ = Describe("Hummus", func() {
 				"tasty": true
 			}`))
 		})
-	})
 
-	It("omits empty values", func() {
+		It("omits empty values", func() {
+			input := struct {
+				Brand string `gabs:"brand,omitempty"`
+				Type  string `gabs:"type,omitempty"`
+				Price int    `gabs:"price,omitempty"`
+			}{
+				Brand: "whole foods",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"brand": "whole foods"
+			}`))
+		})
 	})
 })
