@@ -140,7 +140,10 @@ func parseGabsTag(tag reflect.StructTag) gabsTag {
 
 func parseArrayTag(tag string) (arrayTag, bool) {
 	if strings.Contains(tag, "[") {
-		arrayRegex := regexp.MustCompile("(.*)\\[(\\d+)\\]\\.*(.*)")
+		//regex needs to be non-greedy in order to catch the parent array path first
+		//(in case of arrays inside arrays)
+		arrayRegex := regexp.MustCompile("(.*?)\\[(\\d+)\\]\\.*(.*)")
+
 		matches := arrayRegex.FindStringSubmatch(tag)
 		if len(matches) != 4 {
 			panic("hi")
