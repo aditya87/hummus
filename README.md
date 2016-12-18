@@ -5,15 +5,15 @@ Making nested structs/arrays in order to unmarshal JSON into objects can be such
 
 Well, along comes hummus which makes this super-duper easy. The biggest win, I feel, is that you can have all your nesting information in the same struct. Creating nested arrays and/or objects is a simple matter of using dots (`.`) or square brackets (`[]`) in your tags.
 
-### How to install
+## How to install
 
 ```
 go get github.com/aditya87/hummus
 ```
 
-### How to use
+## How to use
 
-#### Marshaling JSON
+#### Marshalling JSON
 
 ```
 ...
@@ -133,9 +133,9 @@ Gives us:
 #### Notes
 
 1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. E.g.:
-  ```
-  type foo struct{
-    bar string `gabs:"bar,omitempty"`
-  }
-  ```
+```
+type foo struct {
+  bar string `gabs:"bar,omitempty"`
+}
+```
 1. Leverages [reflect](https://golang.org/pkg/reflect/) for dynamic struct interpretation and [gabs](https://github.com/Jeffail/gabs) for dynamic JSON generation.
