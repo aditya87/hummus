@@ -148,7 +148,93 @@ var _ = Describe("Hummus", func() {
 					}
 				]
 			}`))
+		})
 
+		It("handles arrays inside arrays", func() {
+			input := struct {
+				Brand0Name0 string `gabs:"brands[0].name[0]"`
+				Brand0Name1 string `gabs:"brands[0].name[1]"`
+				Brand0Addr0 string `gabs:"brands[0].address[0]"`
+				Brand0Addr1 string `gabs:"brands[0].address[1]"`
+				Brand1Name0 string `gabs:"brands[1].name[0]"`
+				Brand1Name1 string `gabs:"brands[1].name[1]"`
+			}{
+				Brand0Name0: "sabra",
+				Brand0Name1: "eatwell",
+				Brand0Addr0: "1234 Fake St",
+				Brand0Addr1: "1234 Fake2 St",
+				Brand1Name0: "cedars",
+				Brand1Name1: "pitapal",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`{
+				"brands": [
+					{
+						"name": ["sabra", "eatwell"],
+						"address": ["1234 Fake St", "1234 Fake2 St"]
+					},
+					{
+						"name": ["cedars", "pitapal"]
+					}
+				]
+			}`))
+		})
+
+		It("handles all kinds of cray-cray", func() {
+			input := struct {
+				Company           string `gabs:"company"`
+				Address           string `gabs:"address"`
+				Brand0Name        string `gabs:"brands[0].name"`
+				Brand0Flavor      string `gabs:"brands[0].flavor"`
+				Brand0Store0Name  string `gabs:"brands[0].stores[0].name"`
+				Brand0Store0Price int    `gabs:"brands[0].stores[0].price,omitempty"`
+				Brand0Store1Name  string `gabs:"brands[0].stores[1].name"`
+				Brand0Store1Price int    `gabs:"brands[0].stores[1].price,omitempty"`
+				Brand1Name        string `gabs:"brands[1].name,omitempty"`
+				Brand1Flavor      string `gabs:"brands[1].flavor,omitempty"`
+				Brand1Store0      string `gabs:"brands[1].stores[0]"`
+				Brand1Store1      string `gabs:"brands[1].stores[1]"`
+			}{
+				Company:           "hello foods",
+				Address:           "338 New St",
+				Brand0Name:        "sabra",
+				Brand0Flavor:      "jalapeno",
+				Brand0Store0Name:  "safeway",
+				Brand0Store0Price: 5,
+				Brand0Store1Name:  "wholefoods",
+				Brand0Store1Price: 10,
+				Brand1Name:        "cedars",
+				Brand1Store0:      "safeway",
+				Brand1Store1:      "traderjoes",
+			}
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`{
+				"company": "hello foods",
+				"address": "338 New St",
+				"brands": [
+					{
+						"name": "sabra",
+						"flavor": "jalapeno",
+						"stores": [
+							{
+								"name": "safeway",
+								"price": 5
+							},
+							{
+								"name": "wholefoods",
+								"price": 10
+							}
+						]
+					},
+					{
+						"name": "cedars",
+						"stores": ["safeway", "traderjoes"]
+					}
+				]
+			}`))
 		})
 	})
 })
