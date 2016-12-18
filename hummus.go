@@ -118,10 +118,25 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 		} else {
 			jsonObj.SetP(object, path)
 		}
+		replaceHashTags(jsonObj, path)
 		i = j
 	}
 
 	return jsonObj, nil
+}
+
+func replaceHashTags(obj *gabs.Container, path string) {
+	keys := strings.Split(path, ".")
+	curKey := keys[0]
+	curSubTree := obj.Path(curKey)
+	if strings.Contains(curKey, "#") {
+		obj.DeleteP(curKey)
+		curKey = strings.Replace(curKey, "#", ".", -1)
+		obj.Set(curSubTree.Data(), curKey)
+	}
+	if len(keys) != 1 {
+		replaceHashTags(curSubTree, strings.Join(keys[1:], "."))
+	}
 }
 
 func parseGabsTag(tag reflect.StructTag) (gabsTag, error) {

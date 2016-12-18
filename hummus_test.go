@@ -209,6 +209,7 @@ var _ = Describe("Hummus", func() {
 				Brand1Store0:      "safeway",
 				Brand1Store1:      "traderjoes",
 			}
+
 			outJSON, err := hummus.Marshal(input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(outJSON).To(MatchJSON(`{
@@ -234,6 +235,32 @@ var _ = Describe("Hummus", func() {
 						"stores": ["safeway", "traderjoes"]
 					}
 				]
+			}`))
+		})
+
+		It("allows one to escape dots", func() {
+			input := struct {
+				A string `gabs:"outer.inner#notchild#notchild2.value"`
+				B string `gabs:"outer.inner"`
+				C string `gabs:"outer.inner#notchild[0].name"`
+			}{
+				A: "A_val",
+				B: "B_val",
+				C: "C_val",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`{
+				"outer": {
+					"inner.notchild": [{
+							"name": "C_val"
+					}],
+					"inner.notchild.notchild2": {
+						"value": "A_val"
+					},
+					"inner": "B_val"
+				}
 			}`))
 		})
 
