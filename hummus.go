@@ -71,6 +71,10 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 					gtn := parseGabsTag(t.Field(j).Tag)
 					if atn, ok := parseArrayTag(gtn.tagName); ok &&
 						atn.arrayPath == at.arrayPath && atn.arrayIndex == at.arrayIndex {
+						if gtn.omitEmpty && isEmptyValue(v.Field(j)) {
+							j++
+							continue
+						}
 						nextChildTag := fmt.Sprintf("gabs:%q", atn.childPath)
 						childFields = append(childFields, reflect.StructField{
 							Name:   t.Field(j).Name,
