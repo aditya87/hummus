@@ -45,5 +45,37 @@ var _ = Describe("Hummus", func() {
 				"brand": "whole foods"
 			}`))
 		})
+
+		It("deals with nested structs", func() {
+			input := struct {
+				Brand       string `gabs:"brand"`
+				Type        string `gabs:"type"`
+				Tasty       bool   `gabs:"tasty"`
+				AddrStreet  string `gabs:"manufacturer_address.street"`
+				AddrZipCode string `gabs:"manufacturer_address.zipcode"`
+				AddrState   string `gabs:"manufacturer_address.state"`
+			}{
+				Brand:       "sabra",
+				Type:        "jalapeno",
+				Tasty:       true,
+				AddrStreet:  "1234 Fake St.",
+				AddrZipCode: "94040",
+				AddrState:   "CA",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"brand": "sabra",
+				"type": "jalapeno",
+				"tasty": true,
+				"manufacturer_address": {
+					"street": "1234 Fake St.",
+					"zipcode": "94040",
+					"state": "CA"
+				}
+			}`))
+		})
 	})
 })
