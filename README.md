@@ -11,6 +11,19 @@ Well, along comes hummus which makes this super-duper easy. The biggest win, I f
 go get github.com/aditya87/hummus
 ```
 
+#### Fetch dependencies
+
+```
+go get github.com/Jeffail/gabs
+```
+
+##### For testing
+```
+go get github.com/onsi/gomega
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega
+```
+
 ## How to use
 
 #### Marshalling JSON
@@ -130,7 +143,7 @@ Gives us:
 }
 ```
 
-#### Notes
+## Notes
 
 1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. E.g.:
 ```
@@ -139,3 +152,12 @@ type foo struct {
 }
 ```
 1. Leverages [reflect](https://golang.org/pkg/reflect/) for dynamic struct interpretation and [gabs](https://github.com/Jeffail/gabs) for dynamic JSON generation.
+
+## Contributing
+
+PRs are welcome. Make sure unit tests are run. To do so, firstly install the ginkgo and gomega libraries as described in the "fetch dependencies" section above. Then, simply run:
+
+```
+ginkgo .
+```
+In the main directory.
