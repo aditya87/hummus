@@ -96,5 +96,29 @@ var _ = Describe("Hummus", func() {
 				"brands": ["sabra", "athenos", "whole-foods"]
 			}`))
 		})
+
+		It("deals with simple nested arrays", func() {
+			input := struct {
+				Brand0 string `gabs:"safeway.brands[0]"`
+				Brand1 string `gabs:"traderjoes.brands[0]"`
+				Brand2 string `gabs:"traderjoes.brands[1]"`
+			}{
+				Brand0: "sabra",
+				Brand1: "athenos",
+				Brand2: "cedars",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"safeway": {
+					"brands": ["sabra"]
+				},
+				"traderjoes": {
+					"brands": ["athenos", "cedars"]
+				}
+			}`))
+		})
 	})
 })
