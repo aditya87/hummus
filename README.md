@@ -150,6 +150,7 @@ type foo struct {
   bar string `gabs:"bar,omitempty"`
 }
 ```
+
 2. Leverages [reflect](https://golang.org/pkg/reflect/) for dynamic struct interpretation and [gabs](https://github.com/Jeffail/gabs) for dynamic JSON generation.
 
 ## Contributing
