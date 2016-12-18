@@ -1,6 +1,7 @@
 package hummus
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -27,7 +28,7 @@ func Marshal(input interface{}) ([]byte, error) {
 
 	jsonObj, err := marshalReflect(t, v)
 	if err != nil {
-		panic(err)
+		return []byte{}, err
 	}
 
 	return []byte(jsonObj.String()), nil
@@ -37,7 +38,10 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 	jsonObj := gabs.New()
 
 	for i := 0; i < t.NumField(); {
-		gt := parseGabsTag(t.Field(i).Tag)
+		gt, err := parseGabsTag(t.Field(i).Tag)
+		if err != nil {
+			return nil, err
+		}
 
 		if gt.omitEmpty && isEmptyValue(v.Field(i)) {
 			i++
@@ -58,7 +62,6 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 				var childFields []reflect.StructField
 				var childValues []interface{}
 				childTag := fmt.Sprintf("gabs:%q", at.childPath)
-
 				childFields = append(childFields, reflect.StructField{
 					Name:   t.Field(i).Name,
 					Type:   t.Field(i).Type,
@@ -68,7 +71,11 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 
 				childValues = append(childValues, v.Field(i).Interface())
 				for j < t.NumField() {
-					gtn := parseGabsTag(t.Field(j).Tag)
+					gtn, err := parseGabsTag(t.Field(j).Tag)
+					if err != nil {
+						return nil, err
+					}
+
 					if atn, ok := parseArrayTag(gtn.tagName); ok &&
 						atn.arrayPath == at.arrayPath && atn.arrayIndex == at.arrayIndex {
 						if gtn.omitEmpty && isEmptyValue(v.Field(j)) {
@@ -98,7 +105,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 				}
 				childObject, err = marshalReflect(childType, childValue)
 				if err != nil {
-					panic(err)
+					return nil, err
 				}
 
 				object = childObject.Data()
@@ -119,13 +126,17 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 	return jsonObj, nil
 }
 
-func parseGabsTag(tag reflect.StructTag) gabsTag {
+func parseGabsTag(tag reflect.StructTag) (gabsTag, error) {
 	gabsTagString := tag.Get("gabs")
+	if gabsTagString == "" {
+		return gabsTag{}, errors.New("error: invalid struct tag")
+	}
+
 	tagFields := strings.Split(gabsTagString, ",")
 	var omitEmpty bool
 
 	if len(tagFields) > 2 {
-		panic("hello")
+		return gabsTag{}, errors.New("error: invalid number of struct tag fields")
 	}
 
 	if len(tagFields) == 2 && tagFields[1] == "omitempty" {
@@ -135,7 +146,7 @@ func parseGabsTag(tag reflect.StructTag) gabsTag {
 	return gabsTag{
 		tagName:   tagFields[0],
 		omitEmpty: omitEmpty,
-	}
+	}, nil
 }
 
 func parseArrayTag(tag string) (arrayTag, bool) {
@@ -146,12 +157,12 @@ func parseArrayTag(tag string) (arrayTag, bool) {
 
 		matches := arrayRegex.FindStringSubmatch(tag)
 		if len(matches) != 4 {
-			panic("hi")
+			return arrayTag{}, false
 		}
 
 		arrayIndex, err := strconv.Atoi(matches[2])
 		if err != nil {
-			panic(err)
+			return arrayTag{}, false
 		}
 
 		return arrayTag{

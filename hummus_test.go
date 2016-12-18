@@ -236,5 +236,33 @@ var _ = Describe("Hummus", func() {
 				]
 			}`))
 		})
+
+		Context("failure cases", func() {
+			Context("when passed an invalid struct tag", func() {
+				It("returns an error", func() {
+					input := struct {
+						Brand0 string `foo:"safeway.brands[0]"`
+					}{
+						Brand0: "sabra",
+					}
+
+					_, err := hummus.Marshal(input)
+					Expect(err).To(MatchError("error: invalid struct tag"))
+				})
+			})
+
+			Context("when passed extra struct tag fields", func() {
+				It("returns an error", func() {
+					input := struct {
+						Brand0 string `gabs:"safeway.brands[0],omitempty,blah"`
+					}{
+						Brand0: "sabra",
+					}
+
+					_, err := hummus.Marshal(input)
+					Expect(err).To(MatchError("error: invalid number of struct tag fields"))
+				})
+			})
+		})
 	})
 })
