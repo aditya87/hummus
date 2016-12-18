@@ -2,6 +2,8 @@ package hummus
 
 import (
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/jeffail/gabs"
@@ -25,7 +27,34 @@ func Marshal(input interface{}) ([]byte, error) {
 			continue
 		}
 
-		jsonObj.SetP(v.Field(i).Interface(), tagFields[0])
+		path := tagFields[0]
+		array := false
+
+		if strings.Contains(path, "[") {
+			arrayRegex := regexp.MustCompile("(.*)\\[(\\d+)\\]")
+			matches := arrayRegex.FindStringSubmatch(path)
+			if len(matches) != 3 {
+				panic("hi")
+			}
+
+			arrayPath := matches[1]
+			arrayIndex, err := strconv.Atoi(matches[2])
+			if err != nil {
+				panic(err)
+			}
+
+			if arrayIndex == 0 {
+				jsonObj.ArrayP(arrayPath)
+			}
+			array = true
+			path = arrayPath
+		}
+
+		if array {
+			jsonObj.ArrayAppendP(v.Field(i).Interface(), path)
+		} else {
+			jsonObj.SetP(v.Field(i).Interface(), path)
+		}
 	}
 
 	return []byte(jsonObj.String()), nil

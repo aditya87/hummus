@@ -77,5 +77,24 @@ var _ = Describe("Hummus", func() {
 				}
 			}`))
 		})
+
+		It("deals with simple arrays", func() {
+			input := struct {
+				Brand0 string `gabs:"brands[0]"`
+				Brand1 string `gabs:"brands[1]"`
+				Brand2 string `gabs:"brands[2]"`
+			}{
+				Brand0: "sabra",
+				Brand1: "athenos",
+				Brand2: "whole-foods",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"brands": ["sabra", "athenos", "whole-foods"]
+			}`))
+		})
 	})
 })
