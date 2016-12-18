@@ -1,7 +1,7 @@
 # hummus
 A powerful, concise way to marshal JSON in Go.
 
-Making nested structs/arrays in order to unmarshal JSON into objects can be such a pain sometimes, can't it? Especially when you are cherry-picking fields from one flat JSON message and trying to output them into another complex JSON message.
+Making nested structs/arrays in order to marshal JSON from objects can be such a pain sometimes, can't it? Especially when you are cherry-picking fields from one flat JSON message and trying to output them into another complex JSON message.
 
 Well, along comes hummus which makes this super-duper easy. The biggest win, I feel, is that you can have all your nesting information in the same struct. Creating nested arrays and/or objects is a simple matter of using dots (`.`) or square brackets (`[]`) in your tags.
 
