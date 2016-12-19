@@ -274,7 +274,7 @@ var _ = Describe("Hummus", func() {
 					}
 
 					_, err := hummus.Marshal(input)
-					Expect(err).To(MatchError("error: invalid struct tag"))
+					Expect(err).To(MatchError(ContainSubstring("error: invalid struct tag")))
 				})
 			})
 

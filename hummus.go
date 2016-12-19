@@ -142,7 +142,7 @@ func replaceHashTags(obj *gabs.Container, path string) {
 func parseGabsTag(tag reflect.StructTag) (gabsTag, error) {
 	gabsTagString := tag.Get("gabs")
 	if gabsTagString == "" {
-		return gabsTag{}, errors.New("error: invalid struct tag")
+		return gabsTag{}, fmt.Errorf("error: invalid struct tag %s", tag)
 	}
 
 	tagFields := strings.Split(gabsTagString, ",")
