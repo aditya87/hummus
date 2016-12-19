@@ -142,6 +142,47 @@ Gives us:
 }
 ```
 
+#### Special cases
+
+##### Escaping dots
+
+Sometimes, you want to not interpret the dots in a JSON tag as hierarchical keys, instead you just want them to get interpreted as a flat key like so:
+```
+{
+  "properties.name": "value"
+}
+```
+
+Hummus offers you the ability to escape dots. Simply replace dots with hashtags in the struct tags:
+```
+...
+type S struct {
+	V string `gabs:"properties#name"`
+}
+
+func main() {
+	s := S{
+		V: "value",
+	}
+
+	jsonOutput, err := hummus.Marshal(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(jsonOutput))
+}
+```
+
+This gives us:
+```
+{
+  "properties.name": "value"
+}
+```
+
+Which is the desired result.
+
 ## Notes
 
 1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. E.g.:
