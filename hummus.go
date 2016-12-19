@@ -17,7 +17,7 @@ type arrayTag struct {
 	childPath  string
 }
 
-type gabsTag struct {
+type hummusTag struct {
 	tagName   string
 	omitEmpty bool
 }
@@ -64,7 +64,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 			if at.childPath != "" {
 				var childFields []reflect.StructField
 				var childValues []interface{}
-				childTag := fmt.Sprintf("gabs:%q", at.childPath)
+				childTag := fmt.Sprintf("hummus:%q", at.childPath)
 				childFields = append(childFields, reflect.StructField{
 					Name: t.Field(i).Name,
 					Type: t.Field(i).Type,
@@ -84,7 +84,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 							j++
 							continue
 						}
-						nextChildTag := fmt.Sprintf("gabs:%q", atn.childPath)
+						nextChildTag := fmt.Sprintf("hummus:%q", atn.childPath)
 						childFields = append(childFields, reflect.StructField{
 							Name: t.Field(j).Name,
 							Type: t.Field(j).Type,
@@ -167,24 +167,24 @@ func mergeObjects(dst interface{}, src interface{}) interface{} {
 	return dst
 }
 
-func parseGabsTag(tag reflect.StructTag) (gabsTag, error) {
-	gabsTagString := tag.Get("gabs")
-	if gabsTagString == "" {
-		return gabsTag{}, fmt.Errorf("error: invalid struct tag %s", tag)
+func parseGabsTag(tag reflect.StructTag) (hummusTag, error) {
+	hummusTagString := tag.Get("hummus")
+	if hummusTagString == "" {
+		return hummusTag{}, fmt.Errorf("error: invalid struct tag %s", tag)
 	}
 
-	tagFields := strings.Split(gabsTagString, ",")
+	tagFields := strings.Split(hummusTagString, ",")
 	var omitEmpty bool
 
 	if len(tagFields) > 2 {
-		return gabsTag{}, errors.New("error: invalid number of struct tag fields")
+		return hummusTag{}, errors.New("error: invalid number of struct tag fields")
 	}
 
 	if len(tagFields) == 2 && tagFields[1] == "omitempty" {
 		omitEmpty = true
 	}
 
-	return gabsTag{
+	return hummusTag{
 		tagName:   tagFields[0],
 		omitEmpty: omitEmpty,
 	}, nil

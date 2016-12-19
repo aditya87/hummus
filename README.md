@@ -30,14 +30,14 @@ go get github.com/onsi/gomega
 ```
 ...
 type Info struct {
-  Company           string `gabs:"company"`
-	Address           string `gabs:"address"`
-	Brand0Name        string `gabs:"brands[0].name"`
-	Brand0Flavor      string `gabs:"brands[0].flavor"`
-	Brand0Store0Name  string `gabs:"brands[0].stores[0].name"`
-	Brand0Store0Price int    `gabs:"brands[0].stores[0].price,omitempty"`
-	Brand0Store1Name  string `gabs:"brands[0].stores[1].name"`
-	Brand0Store1Price int    `gabs:"brands[0].stores[1].price,omitempty"`
+  Company           string `hummus:"company"`
+	Address           string `hummus:"address"`
+	Brand0Name        string `hummus:"brands[0].name"`
+	Brand0Flavor      string `hummus:"brands[0].flavor"`
+	Brand0Store0Name  string `hummus:"brands[0].stores[0].name"`
+	Brand0Store0Price int    `hummus:"brands[0].stores[0].price,omitempty"`
+	Brand0Store1Name  string `hummus:"brands[0].stores[1].name"`
+	Brand0Store1Price int    `hummus:"brands[0].stores[1].price,omitempty"`
 }
 
 func main() {
@@ -89,14 +89,14 @@ Gives us:
 
 ```
 type Info struct {
-	Name   string `json:"name" gabs:"name"`
-	Flavor string `json:"flavor" gabs:"type"`
+	Name   string `json:"name" hummus:"name"`
+	Flavor string `json:"flavor" hummus:"type"`
 
-	MainSupplierName     string `json:"main_supplier_name" gabs:"suppliers[0].name"`
-	MainSupplierLocation string `json:"main_supplier_location" gabs:"suppliers[0].location"`
+	MainSupplierName     string `json:"main_supplier_name" hummus:"suppliers[0].name"`
+	MainSupplierLocation string `json:"main_supplier_location" hummus:"suppliers[0].location"`
 
-	BackupSupplierName     string `json:"backup_supplier_name" gabs:"suppliers[1].name"`
-	BackupSupplierLocation string `json:"backup_supplier_location" gabs:"suppliers[1].location"`
+	BackupSupplierName     string `json:"backup_supplier_name" hummus:"suppliers[1].name"`
+	BackupSupplierLocation string `json:"backup_supplier_location" hummus:"suppliers[1].location"`
 }
 
 func main() {
@@ -157,7 +157,7 @@ Hummus offers you the ability to escape dots. Simply replace dots with hashtags 
 ```
 ...
 type S struct {
-	V string `gabs:"properties#name"`
+	V string `hummus:"properties#name"`
 }
 
 func main() {
@@ -188,7 +188,7 @@ Which is the desired result.
 1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. E.g.:
 ```
 type foo struct {
-  bar string `gabs:"bar,omitempty"`
+  bar string `hummus:"bar,omitempty"`
 }
 ```
 

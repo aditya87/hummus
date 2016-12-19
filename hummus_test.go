@@ -10,9 +10,9 @@ var _ = Describe("Hummus", func() {
 	Describe("Marshal", func() {
 		It("marshals a simple struct into JSON", func() {
 			input := struct {
-				Brand string `gabs:"brand"`
-				Type  string `gabs:"type"`
-				Tasty bool   `gabs:"tasty"`
+				Brand string `hummus:"brand"`
+				Type  string `hummus:"type"`
+				Tasty bool   `hummus:"tasty"`
 			}{
 				Brand: "sabra",
 				Type:  "jalapeno",
@@ -31,9 +31,9 @@ var _ = Describe("Hummus", func() {
 
 		It("omits empty values", func() {
 			input := struct {
-				Brand string `gabs:"brand,omitempty"`
-				Type  string `gabs:"type,omitempty"`
-				Price int    `gabs:"price,omitempty"`
+				Brand string `hummus:"brand,omitempty"`
+				Type  string `hummus:"type,omitempty"`
+				Price int    `hummus:"price,omitempty"`
 			}{
 				Brand: "whole foods",
 			}
@@ -48,12 +48,12 @@ var _ = Describe("Hummus", func() {
 
 		It("deals with nested structs", func() {
 			input := struct {
-				Brand       string `gabs:"brand"`
-				Type        string `gabs:"type"`
-				Tasty       bool   `gabs:"tasty"`
-				AddrStreet  string `gabs:"manufacturer_address.street"`
-				AddrZipCode string `gabs:"manufacturer_address.zipcode"`
-				AddrState   string `gabs:"manufacturer_address.state"`
+				Brand       string `hummus:"brand"`
+				Type        string `hummus:"type"`
+				Tasty       bool   `hummus:"tasty"`
+				AddrStreet  string `hummus:"manufacturer_address.street"`
+				AddrZipCode string `hummus:"manufacturer_address.zipcode"`
+				AddrState   string `hummus:"manufacturer_address.state"`
 			}{
 				Brand:       "sabra",
 				Type:        "jalapeno",
@@ -80,9 +80,9 @@ var _ = Describe("Hummus", func() {
 
 		It("deals with simple arrays", func() {
 			input := struct {
-				Brand0 string `gabs:"brands[0]"`
-				Brand1 string `gabs:"brands[1]"`
-				Brand2 string `gabs:"brands[2]"`
+				Brand0 string `hummus:"brands[0]"`
+				Brand1 string `hummus:"brands[1]"`
+				Brand2 string `hummus:"brands[2]"`
 			}{
 				Brand0: "sabra",
 				Brand1: "athenos",
@@ -99,9 +99,9 @@ var _ = Describe("Hummus", func() {
 
 		It("deals with simple nested arrays", func() {
 			input := struct {
-				Brand0 string `gabs:"safeway.brands[0]"`
-				Brand1 string `gabs:"traderjoes.brands[0]"`
-				Brand2 string `gabs:"traderjoes.brands[1]"`
+				Brand0 string `hummus:"safeway.brands[0]"`
+				Brand1 string `hummus:"traderjoes.brands[0]"`
+				Brand2 string `hummus:"traderjoes.brands[1]"`
 			}{
 				Brand0: "sabra",
 				Brand1: "athenos",
@@ -123,10 +123,10 @@ var _ = Describe("Hummus", func() {
 
 		It("deals with objects inside arrays", func() {
 			input := struct {
-				Brand0Name string `gabs:"brands[0].name"`
-				Brand0Addr string `gabs:"brands[0].address"`
-				Brand1Name string `gabs:"brands[1].name"`
-				Brand1Addr string `gabs:"brands[1].address"`
+				Brand0Name string `hummus:"brands[0].name"`
+				Brand0Addr string `hummus:"brands[0].address"`
+				Brand1Name string `hummus:"brands[1].name"`
+				Brand1Addr string `hummus:"brands[1].address"`
 			}{
 				Brand0Name: "sabra",
 				Brand0Addr: "1234 Fake St",
@@ -152,12 +152,12 @@ var _ = Describe("Hummus", func() {
 
 		It("handles arrays inside arrays", func() {
 			input := struct {
-				Brand0Name0 string `gabs:"brands[0].name[0]"`
-				Brand0Name1 string `gabs:"brands[0].name[1]"`
-				Brand0Addr0 string `gabs:"brands[0].address[0]"`
-				Brand0Addr1 string `gabs:"brands[0].address[1]"`
-				Brand1Name0 string `gabs:"brands[1].name[0]"`
-				Brand1Name1 string `gabs:"brands[1].name[1]"`
+				Brand0Name0 string `hummus:"brands[0].name[0]"`
+				Brand0Name1 string `hummus:"brands[0].name[1]"`
+				Brand0Addr0 string `hummus:"brands[0].address[0]"`
+				Brand0Addr1 string `hummus:"brands[0].address[1]"`
+				Brand1Name0 string `hummus:"brands[1].name[0]"`
+				Brand1Name1 string `hummus:"brands[1].name[1]"`
 			}{
 				Brand0Name0: "sabra",
 				Brand0Name1: "eatwell",
@@ -184,18 +184,18 @@ var _ = Describe("Hummus", func() {
 
 		It("handles all kinds of cray-cray", func() {
 			input := struct {
-				Company           string `gabs:"company"`
-				Address           string `gabs:"address"`
-				Brand0Name        string `gabs:"brands[0].name"`
-				Brand0Flavor      string `gabs:"brands[0].flavor"`
-				Brand0Store0Name  string `gabs:"brands[0].stores[0].name"`
-				Brand0Store0Price int    `gabs:"brands[0].stores[0].price,omitempty"`
-				Brand0Store1Name  string `gabs:"brands[0].stores[1].name"`
-				Brand0Store1Price int    `gabs:"brands[0].stores[1].price,omitempty"`
-				Brand1Name        string `gabs:"brands[1].name,omitempty"`
-				Brand1Flavor      string `gabs:"brands[1].flavor,omitempty"`
-				Brand1Store0      string `gabs:"brands[1].stores[0]"`
-				Brand1Store1      string `gabs:"brands[1].stores[1]"`
+				Company           string `hummus:"company"`
+				Address           string `hummus:"address"`
+				Brand0Name        string `hummus:"brands[0].name"`
+				Brand0Flavor      string `hummus:"brands[0].flavor"`
+				Brand0Store0Name  string `hummus:"brands[0].stores[0].name"`
+				Brand0Store0Price int    `hummus:"brands[0].stores[0].price,omitempty"`
+				Brand0Store1Name  string `hummus:"brands[0].stores[1].name"`
+				Brand0Store1Price int    `hummus:"brands[0].stores[1].price,omitempty"`
+				Brand1Name        string `hummus:"brands[1].name,omitempty"`
+				Brand1Flavor      string `hummus:"brands[1].flavor,omitempty"`
+				Brand1Store0      string `hummus:"brands[1].stores[0]"`
+				Brand1Store1      string `hummus:"brands[1].stores[1]"`
 			}{
 				Company:           "hello foods",
 				Address:           "338 New St",
@@ -240,11 +240,11 @@ var _ = Describe("Hummus", func() {
 
 		It("allows one to escape dots", func() {
 			input := struct {
-				A string `gabs:"outer.inner#notchild#notchild2.value.name"`
-				B string `gabs:"outer.inner"`
-				C string `gabs:"outer.inner#notchild[0].name"`
-				D string `gabs:"outer.inner#notchild#notchild2.value.name2"`
-				E string `gabs:"outer.inner#notchild[1].name"`
+				A string `hummus:"outer.inner#notchild#notchild2.value.name"`
+				B string `hummus:"outer.inner"`
+				C string `hummus:"outer.inner#notchild[0].name"`
+				D string `hummus:"outer.inner#notchild#notchild2.value.name2"`
+				E string `hummus:"outer.inner#notchild[1].name"`
 			}{
 				A: "A_val",
 				B: "B_val",
@@ -292,7 +292,7 @@ var _ = Describe("Hummus", func() {
 			Context("when passed extra struct tag fields", func() {
 				It("returns an error", func() {
 					input := struct {
-						Brand0 string `gabs:"safeway.brands[0],omitempty,blah"`
+						Brand0 string `hummus:"safeway.brands[0],omitempty,blah"`
 					}{
 						Brand0: "sabra",
 					}
