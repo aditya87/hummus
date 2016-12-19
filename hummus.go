@@ -135,11 +135,36 @@ func replaceHashTags(obj *gabs.Container, path string) {
 	if strings.Contains(curKey, "#") {
 		obj.DeleteP(curKey)
 		curKey = strings.Replace(curKey, "#", ".", -1)
-		obj.Set(curSubTree.Data(), curKey)
+		existingSubTree := obj.S(curKey)
+		subTreeData := existingSubTree.Data()
+		subTreeData = mergeObjects(subTreeData, curSubTree.Data())
+		obj.Set(subTreeData, curKey)
 	}
 	if len(keys) != 1 {
 		replaceHashTags(curSubTree, strings.Join(keys[1:], "."))
 	}
+}
+
+func mergeObjects(dst interface{}, src interface{}) interface{} {
+	dstMap, dmok := dst.(map[string]interface{})
+	srcMap, smok := src.(map[string]interface{})
+	dstArr, daok := dst.([]interface{})
+	srcArr, saok := src.([]interface{})
+	if dmok && smok {
+		for k, v := range srcMap {
+			dstMap[k] = v
+		}
+		dst = dstMap
+	} else if daok && saok {
+		for _, v := range srcArr {
+			dstArr = append(dstArr, v)
+		}
+		dst = dstArr
+	} else {
+		dst = src
+	}
+
+	return dst
 }
 
 func parseGabsTag(tag reflect.StructTag) (gabsTag, error) {

@@ -243,10 +243,14 @@ var _ = Describe("Hummus", func() {
 				A string `gabs:"outer.inner#notchild#notchild2.value"`
 				B string `gabs:"outer.inner"`
 				C string `gabs:"outer.inner#notchild[0].name"`
+				D string `gabs:"outer.inner#notchild#notchild2.value2"`
+				E string `gabs:"outer.inner#notchild[1].name"`
 			}{
 				A: "A_val",
 				B: "B_val",
 				C: "C_val",
+				D: "D_val",
+				E: "E_val",
 			}
 
 			outJSON, err := hummus.Marshal(input)
@@ -255,9 +259,13 @@ var _ = Describe("Hummus", func() {
 				"outer": {
 					"inner.notchild": [{
 							"name": "C_val"
+					},
+					{
+							"name": "E_val"
 					}],
 					"inner.notchild.notchild2": {
-						"value": "A_val"
+						"value": "A_val",
+						"value2": "D_val"
 					},
 					"inner": "B_val"
 				}
