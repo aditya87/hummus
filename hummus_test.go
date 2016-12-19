@@ -264,17 +264,18 @@ var _ = Describe("Hummus", func() {
 			}`))
 		})
 
-		Context("failure cases", func() {
+		Context("special/failure cases", func() {
 			Context("when passed an invalid struct tag", func() {
-				It("returns an error", func() {
+				It("skips the field", func() {
 					input := struct {
 						Brand0 string `foo:"safeway.brands[0]"`
 					}{
 						Brand0: "sabra",
 					}
 
-					_, err := hummus.Marshal(input)
-					Expect(err).To(MatchError(ContainSubstring("error: invalid struct tag")))
+					outJSON, err := hummus.Marshal(input)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(outJSON).To(MatchJSON(`{}`))
 				})
 			})
 

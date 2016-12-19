@@ -39,7 +39,10 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 
 	for i := 0; i < t.NumField(); {
 		gt, err := parseGabsTag(t.Field(i).Tag)
-		if err != nil {
+		if err != nil && strings.Contains(err.Error(), "invalid struct tag") {
+			i++
+			continue
+		} else if err != nil {
 			return nil, err
 		}
 
