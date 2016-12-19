@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeffail/gabs"
+	"github.com/Jeffail/gabs"
 )
 
 type arrayTag struct {
