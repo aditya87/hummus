@@ -194,8 +194,9 @@ var _ = Describe("Hummus", func() {
 				Brand0Store1Price int    `hummus:"brands[0].stores[1].price,omitempty"`
 				Brand1Name        string `hummus:"brands[1].name,omitempty"`
 				Brand1Flavor      string `hummus:"brands[1].flavor,omitempty"`
-				Brand1Store0      string `hummus:"brands[1].stores[0]"`
-				Brand1Store1      string `hummus:"brands[1].stores[1]"`
+				Brand1Store0Name  string `hummus:"brands[1].stores[0].name"`
+				Brand1Store0Price int    `hummus:"brands[1].stores[0].price,omitempty"`
+				Reputation        string `hummus:"reputation.type"`
 			}{
 				Company:           "hello foods",
 				Address:           "338 New St",
@@ -206,8 +207,9 @@ var _ = Describe("Hummus", func() {
 				Brand0Store1Name:  "wholefoods",
 				Brand0Store1Price: 10,
 				Brand1Name:        "cedars",
-				Brand1Store0:      "safeway",
-				Brand1Store1:      "traderjoes",
+				Brand1Store0Name:  "safeway",
+				Brand1Store0Price: 10,
+				Reputation:        "good",
 			}
 
 			outJSON, err := hummus.Marshal(input)
@@ -232,9 +234,17 @@ var _ = Describe("Hummus", func() {
 					},
 					{
 						"name": "cedars",
-						"stores": ["safeway", "traderjoes"]
+						"stores": [
+						  {
+							  "name": "safeway",
+								"price": 10
+							}
+						]
 					}
-				]
+				],
+				"reputation": {
+					"type": "good"
+				}
 			}`))
 		})
 
