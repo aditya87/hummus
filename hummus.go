@@ -152,7 +152,7 @@ func mergeObjects(dst interface{}, src interface{}) interface{} {
 	srcArr, saok := src.([]interface{})
 	if dmok && smok {
 		for k, v := range srcMap {
-			dstMap[k] = v
+			dstMap[k] = mergeObjects(dstMap[k], v)
 		}
 		dst = dstMap
 	} else if daok && saok {

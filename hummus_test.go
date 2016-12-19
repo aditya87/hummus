@@ -240,10 +240,10 @@ var _ = Describe("Hummus", func() {
 
 		It("allows one to escape dots", func() {
 			input := struct {
-				A string `gabs:"outer.inner#notchild#notchild2.value"`
+				A string `gabs:"outer.inner#notchild#notchild2.value.name"`
 				B string `gabs:"outer.inner"`
 				C string `gabs:"outer.inner#notchild[0].name"`
-				D string `gabs:"outer.inner#notchild#notchild2.value2"`
+				D string `gabs:"outer.inner#notchild#notchild2.value.name2"`
 				E string `gabs:"outer.inner#notchild[1].name"`
 			}{
 				A: "A_val",
@@ -264,8 +264,10 @@ var _ = Describe("Hummus", func() {
 							"name": "E_val"
 					}],
 					"inner.notchild.notchild2": {
-						"value": "A_val",
-						"value2": "D_val"
+						"value": {
+							"name": "A_val",
+							"name2": "D_val"
+						}
 					},
 					"inner": "B_val"
 				}
