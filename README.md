@@ -185,7 +185,7 @@ Which is the desired result.
 
 ## Notes
 
-1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. E.g.:
+1. Also provided an `omitempty` option to ignore empty fields, just like the [encoding/json](https://golang.org/pkg/encoding/json/) library. e.g.:
 ```
 type foo struct {
   bar string `hummus:"bar,omitempty"`
