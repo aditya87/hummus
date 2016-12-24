@@ -38,7 +38,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 	jsonObj := gabs.New()
 
 	for i := 0; i < t.NumField(); {
-		gt, err := parseGabsTag(t.Field(i).Tag)
+		gt, err := parseHummusTag(t.Field(i).Tag)
 		if err != nil && strings.Contains(err.Error(), "invalid struct tag") {
 			i++
 			continue
@@ -73,7 +73,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 
 				childValues = append(childValues, v.Field(i).Interface())
 				for j < t.NumField() {
-					gtn, err := parseGabsTag(t.Field(j).Tag)
+					gtn, err := parseHummusTag(t.Field(j).Tag)
 					if err != nil {
 						return nil, err
 					}
@@ -167,7 +167,7 @@ func mergeObjects(dst interface{}, src interface{}) interface{} {
 	return dst
 }
 
-func parseGabsTag(tag reflect.StructTag) (hummusTag, error) {
+func parseHummusTag(tag reflect.StructTag) (hummusTag, error) {
 	hummusTagString := tag.Get("hummus")
 	if hummusTagString == "" {
 		return hummusTag{}, fmt.Errorf("error: invalid struct tag %s", tag)
