@@ -14,7 +14,6 @@ var _ = Describe("Tree", func() {
 				t.Insert(`hummus:"brand"`, "sabra")
 				Expect(t.NodeMap["brand"]).To(Equal(tree.Node{
 					Path:        "brand",
-					OmitEmpty:   false,
 					IsArray:     false,
 					SingleChild: "sabra",
 				}))
@@ -28,7 +27,6 @@ var _ = Describe("Tree", func() {
 				t.Insert(`hummus:"brands[1]"`, "cedars")
 				Expect(t.NodeMap["brands"]).To(Equal(tree.Node{
 					Path:          "brands",
-					OmitEmpty:     false,
 					IsArray:       true,
 					ArrayChildren: []interface{}{"sabra", "cedars"},
 				}))
@@ -42,7 +40,6 @@ var _ = Describe("Tree", func() {
 				t.Insert(`hummus:"brands[0]"`, "cedars")
 				Expect(t.NodeMap["brands"]).To(Equal(tree.Node{
 					Path:          "brands",
-					OmitEmpty:     false,
 					IsArray:       true,
 					ArrayChildren: []interface{}{"cedars", "sabra"},
 				}))
@@ -57,21 +54,18 @@ var _ = Describe("Tree", func() {
 				t.Insert(`hummus:"brands[1].name"`, "cedars")
 				t.Insert(`hummus:"brands[1].location"`, "washington")
 				Expect(t.NodeMap["brands"]).To(Equal(tree.Node{
-					Path:      "brands",
-					OmitEmpty: false,
-					IsArray:   true,
+					Path:    "brands",
+					IsArray: true,
 					ArrayChildren: []interface{}{
 						tree.Tree{
 							NodeMap: map[string]tree.Node{
 								"name": tree.Node{
 									Path:        "name",
-									OmitEmpty:   false,
 									IsArray:     false,
 									SingleChild: "sabra",
 								},
 								"location": tree.Node{
 									Path:        "location",
-									OmitEmpty:   false,
 									IsArray:     false,
 									SingleChild: "california",
 								},
@@ -81,13 +75,11 @@ var _ = Describe("Tree", func() {
 							NodeMap: map[string]tree.Node{
 								"name": tree.Node{
 									Path:        "name",
-									OmitEmpty:   false,
 									IsArray:     false,
 									SingleChild: "cedars",
 								},
 								"location": tree.Node{
 									Path:        "location",
-									OmitEmpty:   false,
 									IsArray:     false,
 									SingleChild: "washington",
 								},

@@ -12,7 +12,6 @@ import (
 type Node struct {
 	Path          string
 	IsArray       bool
-	OmitEmpty     bool
 	SingleChild   interface{}
 	ArrayChildren []interface{}
 }
@@ -50,7 +49,6 @@ func (t Tree) Insert(tag string, child interface{}) error {
 		if _, exists := t.NodeMap[at.arrayPath]; !exists {
 			t.NodeMap[at.arrayPath] = Node{
 				Path:          at.arrayPath,
-				OmitEmpty:     gt.omitEmpty,
 				IsArray:       true,
 				ArrayChildren: []interface{}{},
 			}
@@ -88,7 +86,6 @@ func (t Tree) Insert(tag string, child interface{}) error {
 		t.NodeMap[gt.tagName] = Node{
 			Path:        gt.tagName,
 			IsArray:     false,
-			OmitEmpty:   gt.omitEmpty,
 			SingleChild: child,
 		}
 	}
