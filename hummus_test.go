@@ -101,18 +101,21 @@ var _ = Describe("Hummus", func() {
 			input := struct {
 				Brand0 string `hummus:"brands[2]"`
 				Brand1 string `hummus:"brands[0]"`
+				Random string `hummus:"random"`
 				Brand2 string `hummus:"brands[1]"`
 			}{
 				Brand0: "sabra",
 				Brand1: "athenos",
 				Brand2: "whole-foods",
+				Random: "foo",
 			}
 
 			outJSON, err := hummus.Marshal(input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(outJSON).To(MatchJSON(`
 			{
-				"brands": ["athenos", "whole-foods", "sabra"]
+				"brands": ["athenos", "whole-foods", "sabra"],
+				"random": "foo"
 			}`))
 		})
 
