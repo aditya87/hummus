@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/jeffail/gabs"
 )
 
 type Node struct {
@@ -37,10 +39,16 @@ func NewTree() Tree {
 	}
 }
 
-func (t Tree) Insert(tag string, child interface{}) error {
+func (t Tree) Insert(tag string, child interface{}, empty bool) error {
 	gt, err := parseHummusTag(reflect.StructTag(tag))
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "invalid struct tag") {
+		return nil
+	} else if err != nil {
 		return err
+	}
+
+	if gt.omitEmpty && empty {
+		return nil
 	}
 
 	childToInsert := child
@@ -74,7 +82,7 @@ func (t Tree) Insert(tag string, child interface{}) error {
 				return errors.New("fatal error: existing subchild is not a tree")
 			}
 
-			err = childTree.Insert(fmt.Sprintf("hummus:%q", at.childPath), child)
+			err = childTree.Insert(fmt.Sprintf("hummus:%q", at.childPath), child, empty)
 			if err != nil {
 				return err
 			}
@@ -91,6 +99,70 @@ func (t Tree) Insert(tag string, child interface{}) error {
 	}
 
 	return nil
+}
+
+func (t Tree) BuildJSON() *gabs.Container {
+	jsonObj := gabs.New()
+
+	for path, node := range t.NodeMap {
+		if !node.IsArray {
+			jsonObj.SetP(node.SingleChild, path)
+		} else {
+			jsonObj.ArrayP(path)
+
+			for _, child := range node.ArrayChildren {
+				if childTree, ok := child.(Tree); ok {
+					childJsonObj := childTree.BuildJSON()
+					jsonObj.ArrayAppendP(childJsonObj.Data(), path)
+				} else {
+					jsonObj.ArrayAppendP(child, path)
+				}
+			}
+		}
+
+		replaceHashTags(jsonObj, path)
+	}
+
+	return jsonObj
+}
+
+func replaceHashTags(obj *gabs.Container, path string) {
+	keys := strings.Split(path, ".")
+	curKey := keys[0]
+	curSubTree := obj.Path(curKey)
+	if strings.Contains(curKey, "#") {
+		obj.DeleteP(curKey)
+		curKey = strings.Replace(curKey, "#", ".", -1)
+		existingSubTree := obj.S(curKey)
+		subTreeData := existingSubTree.Data()
+		subTreeData = mergeObjects(subTreeData, curSubTree.Data())
+		obj.Set(subTreeData, curKey)
+	}
+	if len(keys) != 1 {
+		replaceHashTags(curSubTree, strings.Join(keys[1:], "."))
+	}
+}
+
+func mergeObjects(dst interface{}, src interface{}) interface{} {
+	dstMap, dmok := dst.(map[string]interface{})
+	srcMap, smok := src.(map[string]interface{})
+	dstArr, daok := dst.([]interface{})
+	srcArr, saok := src.([]interface{})
+	if dmok && smok {
+		for k, v := range srcMap {
+			dstMap[k] = mergeObjects(dstMap[k], v)
+		}
+		dst = dstMap
+	} else if daok && saok {
+		for _, v := range srcArr {
+			dstArr = append(dstArr, v)
+		}
+		dst = dstArr
+	} else {
+		dst = src
+	}
+
+	return dst
 }
 
 func parseHummusTag(tag reflect.StructTag) (hummusTag, error) {

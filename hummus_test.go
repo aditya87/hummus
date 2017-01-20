@@ -97,6 +97,25 @@ var _ = Describe("Hummus", func() {
 			}`))
 		})
 
+		It("handles arrays out of order", func() {
+			input := struct {
+				Brand0 string `hummus:"brands[2]"`
+				Brand1 string `hummus:"brands[0]"`
+				Brand2 string `hummus:"brands[1]"`
+			}{
+				Brand0: "sabra",
+				Brand1: "athenos",
+				Brand2: "whole-foods",
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"brands": ["athenos", "whole-foods", "sabra"]
+			}`))
+		})
+
 		It("deals with simple nested arrays", func() {
 			input := struct {
 				Brand0 string `hummus:"safeway.brands[0]"`
@@ -208,7 +227,7 @@ var _ = Describe("Hummus", func() {
 				Brand0Store1Price: 10,
 				Brand1Name:        "cedars",
 				Brand1Store0Name:  "safeway",
-				Brand1Store0Price: 10,
+				Brand1Store0Price: 0,
 				Reputation:        "good",
 			}
 
@@ -236,8 +255,7 @@ var _ = Describe("Hummus", func() {
 						"name": "cedars",
 						"stores": [
 						  {
-							  "name": "safeway",
-								"price": 10
+							  "name": "safeway"
 							}
 						]
 					}

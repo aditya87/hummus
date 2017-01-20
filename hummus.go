@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Jeffail/gabs"
+	"github.com/aditya87/hummus/tree"
+	"github.com/jeffail/gabs"
 )
 
 type arrayTag struct {
@@ -35,136 +36,16 @@ func Marshal(input interface{}) ([]byte, error) {
 }
 
 func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
-	jsonObj := gabs.New()
+	parseTree := tree.NewTree()
 
-	for i := 0; i < t.NumField(); {
-		gt, err := parseHummusTag(t.Field(i).Tag)
-		if err != nil && strings.Contains(err.Error(), "invalid struct tag") {
-			i++
-			continue
-		} else if err != nil {
+	for i := 0; i < t.NumField(); i++ {
+		err := parseTree.Insert(string(t.Field(i).Tag), v.Field(i).Interface(), isEmptyValue(v.Field(i)))
+		if err != nil {
 			return nil, err
 		}
-
-		if gt.omitEmpty && isEmptyValue(v.Field(i)) {
-			i++
-			continue
-		}
-
-		path := gt.tagName
-		array := false
-		object := v.Field(i).Interface()
-		j := i + 1
-
-		if at, ok := parseArrayTag(path); ok {
-			if !jsonObj.ExistsP(at.arrayPath) {
-				jsonObj.ArrayP(at.arrayPath)
-			}
-
-			if at.childPath != "" {
-				var childFields []reflect.StructField
-				var childValues []interface{}
-				childTag := fmt.Sprintf("hummus:%q", at.childPath)
-				childFields = append(childFields, reflect.StructField{
-					Name: t.Field(i).Name,
-					Type: t.Field(i).Type,
-					Tag:  reflect.StructTag(childTag),
-				})
-
-				childValues = append(childValues, v.Field(i).Interface())
-				for j < t.NumField() {
-					gtn, err := parseHummusTag(t.Field(j).Tag)
-					if err != nil {
-						return nil, err
-					}
-
-					if atn, ok := parseArrayTag(gtn.tagName); ok &&
-						atn.arrayPath == at.arrayPath && atn.arrayIndex == at.arrayIndex {
-						if gtn.omitEmpty && isEmptyValue(v.Field(j)) {
-							j++
-							continue
-						}
-						nextChildTag := fmt.Sprintf("hummus:%q", atn.childPath)
-						childFields = append(childFields, reflect.StructField{
-							Name: t.Field(j).Name,
-							Type: t.Field(j).Type,
-							Tag:  reflect.StructTag(nextChildTag),
-						})
-						childValues = append(childValues, v.Field(j).Interface())
-						j++
-					} else {
-						break
-					}
-				}
-
-				var err error
-				var childObject *gabs.Container
-				childType := reflect.StructOf(childFields)
-				childValue := reflect.New(childType).Elem()
-				for k, v := range childValues {
-					childValue.Field(k).Set(reflect.ValueOf(v))
-				}
-				childObject, err = marshalReflect(childType, childValue)
-				if err != nil {
-					return nil, err
-				}
-
-				object = childObject.Data()
-			}
-
-			array = true
-			path = at.arrayPath
-		}
-
-		if array {
-			jsonObj.ArrayAppendP(object, path)
-		} else {
-			jsonObj.SetP(object, path)
-		}
-		replaceHashTags(jsonObj, path)
-		i = j
 	}
 
-	return jsonObj, nil
-}
-
-func replaceHashTags(obj *gabs.Container, path string) {
-	keys := strings.Split(path, ".")
-	curKey := keys[0]
-	curSubTree := obj.Path(curKey)
-	if strings.Contains(curKey, "#") {
-		obj.DeleteP(curKey)
-		curKey = strings.Replace(curKey, "#", ".", -1)
-		existingSubTree := obj.S(curKey)
-		subTreeData := existingSubTree.Data()
-		subTreeData = mergeObjects(subTreeData, curSubTree.Data())
-		obj.Set(subTreeData, curKey)
-	}
-	if len(keys) != 1 {
-		replaceHashTags(curSubTree, strings.Join(keys[1:], "."))
-	}
-}
-
-func mergeObjects(dst interface{}, src interface{}) interface{} {
-	dstMap, dmok := dst.(map[string]interface{})
-	srcMap, smok := src.(map[string]interface{})
-	dstArr, daok := dst.([]interface{})
-	srcArr, saok := src.([]interface{})
-	if dmok && smok {
-		for k, v := range srcMap {
-			dstMap[k] = mergeObjects(dstMap[k], v)
-		}
-		dst = dstMap
-	} else if daok && saok {
-		for _, v := range srcArr {
-			dstArr = append(dstArr, v)
-		}
-		dst = dstArr
-	} else {
-		dst = src
-	}
-
-	return dst
+	return parseTree.BuildJSON(), nil
 }
 
 func parseHummusTag(tag reflect.StructTag) (hummusTag, error) {
