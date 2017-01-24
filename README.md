@@ -199,6 +199,6 @@ type foo struct {
 PRs are welcome. Make sure unit tests are run. To do so, firstly install the ginkgo and gomega libraries as described in the "fetch dependencies" section above. Then, simply run:
 
 ```
-ginkgo .
+ginkgo -r .
 ```
 In the main directory.
