@@ -37,17 +37,34 @@ func Marshal(input interface{}) ([]byte, error) {
 
 func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 	parseTree := tree.NewTree()
+	var err error
 
 	for i := 0; i < t.NumField(); i++ {
-		dataToMarshal := v.Field(i).Interface()
-		if v.Field(i).Kind() == reflect.Struct {
-			childJSONObj, err := marshalReflect(reflect.TypeOf(dataToMarshal), v.Field(i))
+		curTypeField := t.Field(i)
+		curValueField := v.Field(i)
+
+		if curValueField.Kind() == reflect.Struct {
+			childJSONObj, err := marshalReflect(reflect.TypeOf(curValueField.Interface()), curValueField)
 			if err != nil {
 				return nil, err
 			}
-			dataToMarshal = childJSONObj.Data()
+
+			err = parseTree.Insert(string(curTypeField.Tag), childJSONObj.Data(), isEmptyValue(curValueField))
+		} else if curValueField.Kind() == reflect.Slice && curValueField.Index(0).Kind() == reflect.Struct {
+			var arrayToMarshal []interface{}
+			var childJSONArrayElement *gabs.Container
+
+			for j := 0; j < curValueField.Len(); j++ {
+				elementToMarshal := curValueField.Index(j).Interface()
+				childJSONArrayElement, err = marshalReflect(reflect.TypeOf(elementToMarshal), curValueField.Index(j))
+				arrayToMarshal = append(arrayToMarshal, childJSONArrayElement.Data())
+			}
+
+			err = parseTree.Insert(string(curTypeField.Tag), arrayToMarshal, isEmptyValue(curValueField))
+		} else {
+			err = parseTree.Insert(string(curTypeField.Tag), curValueField.Interface(), isEmptyValue(curValueField))
 		}
-		err := parseTree.Insert(string(t.Field(i).Tag), dataToMarshal, isEmptyValue(v.Field(i)))
+
 		if err != nil {
 			return nil, err
 		}
