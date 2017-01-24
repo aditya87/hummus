@@ -39,7 +39,15 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 	parseTree := tree.NewTree()
 
 	for i := 0; i < t.NumField(); i++ {
-		err := parseTree.Insert(string(t.Field(i).Tag), v.Field(i).Interface(), isEmptyValue(v.Field(i)))
+		dataToMarshal := v.Field(i).Interface()
+		if v.Field(i).Kind() == reflect.Struct {
+			childJSONObj, err := marshalReflect(reflect.TypeOf(dataToMarshal), v.Field(i))
+			if err != nil {
+				return nil, err
+			}
+			dataToMarshal = childJSONObj.Data()
+		}
+		err := parseTree.Insert(string(t.Field(i).Tag), dataToMarshal, isEmptyValue(v.Field(i)))
 		if err != nil {
 			return nil, err
 		}
