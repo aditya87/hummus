@@ -50,7 +50,7 @@ func marshalReflect(t reflect.Type, v reflect.Value) (*gabs.Container, error) {
 			}
 
 			err = parseTree.Insert(string(curTypeField.Tag), childJSONObj.Data(), isEmptyValue(curValueField))
-		} else if curValueField.Kind() == reflect.Slice && curValueField.Index(0).Kind() == reflect.Struct {
+		} else if curValueField.Kind() == reflect.Slice && curValueField.Len() > 0 && curValueField.Index(0).Kind() == reflect.Struct {
 			var arrayToMarshal []interface{}
 			var childJSONArrayElement *gabs.Container
 

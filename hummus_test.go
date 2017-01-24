@@ -381,6 +381,29 @@ var _ = Describe("Hummus", func() {
 			}`))
 		})
 
+		It("allows empty arrays of structs", func() {
+			type Inner struct {
+				A string `hummus:"innerchild.fieldA"`
+				B string `hummus:"innerchild.fieldB"`
+			}
+
+			input := struct {
+				C string  `hummus:"fieldC"`
+				I []Inner `hummus:"inner"`
+			}{
+				C: "C_val",
+				I: []Inner{},
+			}
+
+			outJSON, err := hummus.Marshal(input)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(outJSON).To(MatchJSON(`
+			{
+				"fieldC": "C_val",
+				"inner": []
+			}`))
+		})
+
 		Context("special/failure cases", func() {
 			Context("when passed an invalid struct tag", func() {
 				It("skips the field", func() {
