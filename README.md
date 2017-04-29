@@ -192,7 +192,6 @@ type foo struct {
 }
 ```
 2. Leverages [reflect](https://golang.org/pkg/reflect/) for dynamic struct interpretation and [gabs](https://github.com/Jeffail/gabs) for dynamic JSON generation.
-~~3. Array struct tags have to be provided in order, and consecutively (i.e. they cannot be interspersed with non-array tags). I am working on a solution to this, but currently this is the behavior.~~ Not anymore. See release v3.
 
 ## Contributing
 
