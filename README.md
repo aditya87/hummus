@@ -1,5 +1,5 @@
 # hummus
-A powerful, concise way to marshal JSON in Go.
+A concise way to declare structs and marshal them into JSON in Go.
 
 Making nested structs/arrays in order to marshal JSON from objects can be such a pain sometimes, can't it? Especially when you are cherry-picking fields from one flat JSON message and trying to output them into another complex JSON message.
 
